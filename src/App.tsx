@@ -56,9 +56,11 @@ function AppContent() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Navigation Overview</BreadcrumbPage>
-                </BreadcrumbItem>
+                {useBreadcrumb().items.map((item, index) => (
+                  <BreadcrumbItem key={item.href}>
+                    <BreadcrumbPage href={item.href}>{item.label}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                ))}
               </BreadcrumbList>
             </Breadcrumb>
           </header>
