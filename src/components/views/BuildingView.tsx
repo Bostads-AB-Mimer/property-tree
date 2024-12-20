@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Building, DoorClosed, Home, Users, ArrowRight } from 'lucide-react'
-import { buildingService } from '../../services/api'
+import { buildingService, residenceService } from '../../services/api'
 import { Building as BuildingType } from '../../services/types'
 import { StatCard } from '../shared/StatCard'
 import { ViewHeader } from '../shared/ViewHeader'
@@ -12,7 +12,7 @@ import { Grid } from '../ui/grid'
 export function BuildingView() {
   const { buildingId } = useParams()
   const navigate = useNavigate()
-  
+
   const buildingQuery = useQuery({
     queryKey: ['building', buildingId],
     queryFn: () => buildingService.getById(buildingId!),
@@ -78,7 +78,7 @@ export function BuildingView() {
           title="Lägenheter"
           value={residencesQuery.data?.length || 0}
           icon={Home}
-          subtitle={`${residencesQuery.data?.filter(r => !r.deleted).length || 0} aktiva`}
+          subtitle={`${residencesQuery.data?.filter((r) => !r.deleted).length || 0} aktiva`}
         />
         <StatCard
           title="Uppgångar"
@@ -87,7 +87,7 @@ export function BuildingView() {
         />
         <StatCard
           title="Uthyrningsgrad"
-          value={`${Math.round((residencesQuery.data?.filter(r => !r.deleted).length || 0) / (residencesQuery.data?.length || 1) * 100)}%`}
+          value={`${Math.round(((residencesQuery.data?.filter((r) => !r.deleted).length || 0) / (residencesQuery.data?.length || 1)) * 100)}%`}
           icon={Users}
         />
         <StatCard
@@ -120,7 +120,10 @@ export function BuildingView() {
                           Uppgång {entranceId}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          {residencesQuery.data?.filter(r => r.entrance === entranceId).length || 0} lägenheter
+                          {residencesQuery.data?.filter(
+                            (r) => r.entrance === entranceId
+                          ).length || 0}{' '}
+                          lägenheter
                         </p>
                       </div>
                       <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
