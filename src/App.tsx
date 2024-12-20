@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
 } from 'react-router-dom'
+import { useBreadcrumb } from './components/hooks/useBreadcrumb'
 import { CommandPalette } from './components/CommandPalette'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
