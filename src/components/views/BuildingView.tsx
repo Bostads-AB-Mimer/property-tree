@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Building, DoorClosed, Home, Users, ArrowRight } from 'lucide-react'
-import { buildingService, residenceService } from '../../services/api'
+import { buildingService, residenceService, staircaseService } from '../../services/api'
 import { Building as BuildingType } from '../../services/types'
 import { StatCard } from '../shared/StatCard'
 import { ViewHeader } from '../shared/ViewHeader'
@@ -25,8 +25,14 @@ export function BuildingView() {
     enabled: !!buildingQuery.data?.code,
   })
 
-  const isLoading = buildingQuery.isLoading || residencesQuery.isLoading
-  const error = buildingQuery.error || residencesQuery.error
+  const staircasesQuery = useQuery({
+    queryKey: ['staircases', buildingQuery.data?.code],
+    queryFn: () => staircaseService.getByBuildingCode(buildingQuery.data!.code),
+    enabled: !!buildingQuery.data?.code,
+  })
+
+  const isLoading = buildingQuery.isLoading || residencesQuery.isLoading || staircasesQuery.isLoading
+  const error = buildingQuery.error || residencesQuery.error || staircasesQuery.error
   const building = buildingQuery.data
 
   if (isLoading) {
@@ -107,21 +113,21 @@ export function BuildingView() {
           <div className="space-y-6">
             <Card title="Uppgångar" icon={DoorClosed}>
               <Grid cols={2}>
-                {building.entrances?.map((entranceId) => (
+                {staircasesQuery.data?.map((staircase) => (
                   <motion.div
-                    key={entranceId}
+                    key={staircase.id}
                     whileHover={{ scale: 1.02 }}
-                    onClick={() => navigate(`/entrances/${entranceId}`)}
+                    onClick={() => navigate(`/staircases/${building.code}/${staircase.id}`)}
                     className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer group"
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium group-hover:text-blue-500 transition-colors">
-                          Uppgång {entranceId}
+                          {staircase.name || `Uppgång ${staircase.code}`}
                         </h3>
                         <p className="text-sm text-gray-500">
                           {residencesQuery.data?.filter(
-                            (r) => r.entrance === entranceId
+                            (r) => r.entrance === staircase.code
                           ).length || 0}{' '}
                           lägenheter
                         </p>
