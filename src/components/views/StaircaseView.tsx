@@ -229,7 +229,7 @@ export function StaircaseView() {
                   <span className="text-sm text-gray-500">
                     Senaste inspektion
                   </span>
-                  <span className="text-sm font-medium">2024-02-15</span>
+                  <span className="text-sm font-medium opacity-50">2024-02-15</span>
                 </div>
               </div>
 

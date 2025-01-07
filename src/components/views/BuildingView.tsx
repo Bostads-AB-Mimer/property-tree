@@ -187,7 +187,7 @@ export function BuildingView() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center opacity-50">
                   <span className="text-sm text-gray-500">
                     Senaste besiktning
                   </span>
