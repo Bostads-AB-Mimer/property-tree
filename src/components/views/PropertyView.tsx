@@ -70,7 +70,7 @@ export function PropertyView() {
     <div className="p-8 animate-in">
       <ViewHeader
         title={propertyQuery.data.designation}
-        subtitle={`${propertyQuery.data.municipality}, ${propertyQuery.data.tract}`}
+        subtitle={`${propertyQuery.data.municipality}, ${propertyQuery.data.congregation}`}
         type="Fastighet"
         icon={Building2}
       />

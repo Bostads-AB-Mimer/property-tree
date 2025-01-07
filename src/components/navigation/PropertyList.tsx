@@ -45,31 +45,31 @@ export function PropertyList({ company }: PropertyListProps) {
     )
   }
 
-  // Group properties by tract
-  const propertiesByTract = properties?.reduce((acc, property) => {
-    const tract = property.tract || 'Övriga'
-    if (!acc[tract]) {
-      acc[tract] = []
+  // Group properties by congregation
+  const propertiesByCongregation = properties?.reduce((acc, property) => {
+    const congregation = property.congregation || 'Övriga'
+    if (!acc[congregation]) {
+      acc[congregation] = []
     }
-    acc[tract].push(property)
+    acc[congregation].push(property)
     return acc
   }, {} as Record<string, typeof properties>)
 
   return (
     <div className="space-y-2">
-      {propertiesByTract && Object.entries(propertiesByTract).map(([tract, tractProperties]) => (
-        <Collapsible key={tract} defaultOpen>
+      {propertiesByCongregation && Object.entries(propertiesByCongregation).map(([congregation, congregationProperties]) => (
+        <Collapsible key={congregation} defaultOpen>
           <SidebarGroup>
             <SidebarGroupLabel asChild>
               <CollapsibleTrigger className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                {tract}
+                {congregation}
               </CollapsibleTrigger>
             </SidebarGroupLabel>
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {tractProperties.map((property) => (
+                  {congregationProperties.map((property) => (
                     <PropertyNavigation key={property.id} property={property} />
                   ))}
                 </SidebarMenu>
