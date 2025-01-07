@@ -1,6 +1,6 @@
 import React from 'react'
 import { DeckGL } from 'deck.gl'
-import { ScatterplotLayer } from '@deck.gl/layers/typed'
+import { ScatterplotLayer } from '@deck.gl/layers'
 import { Map } from 'react-map-gl'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
