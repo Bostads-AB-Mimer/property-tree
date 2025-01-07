@@ -1,8 +1,7 @@
-import React from 'react'
-import { DeckGL } from 'deck.gl'
+import React, { useEffect, useRef } from 'react'
+import { Map } from 'maplibre-gl'
+import { MapboxOverlay } from '@deck.gl/mapbox'
 import { ScatterplotLayer } from '@deck.gl/layers'
-import { Map } from 'react-map-gl/maplibre'
-import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 interface PropertyMapProps {
@@ -12,45 +11,53 @@ interface PropertyMapProps {
 }
 
 export function PropertyMap({ latitude = 59.3293, longitude = 18.0686, address }: PropertyMapProps) {
-  const INITIAL_VIEW_STATE = {
-    latitude,
-    longitude,
-    zoom: 13,
-    pitch: 0,
-    bearing: 0
-  }
+  const mapContainer = useRef<HTMLDivElement>(null)
+  const map = useRef<Map | null>(null)
 
-  const layers = [
-    new ScatterplotLayer({
-      id: 'property',
-      data: [{position: [longitude, latitude], address}],
-      pickable: true,
-      opacity: 0.8,
-      stroked: true,
-      filled: true,
-      radiusScale: 6,
-      radiusMinPixels: 5,
-      radiusMaxPixels: 100,
-      lineWidthMinPixels: 1,
-      getPosition: d => d.position,
-      getFillColor: [255, 0, 0],
-      getLineColor: [0, 0, 0],
-      getTooltip: ({object}) => object && object.address
+  useEffect(() => {
+    if (!mapContainer.current) return
+
+    map.current = new Map({
+      container: mapContainer.current,
+      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      center: [longitude, latitude],
+      zoom: 13
     })
-  ]
+
+    map.current.once('load', () => {
+      const deckOverlay = new MapboxOverlay({
+        interleaved: true,
+        layers: [
+          new ScatterplotLayer({
+            id: 'property',
+            data: [{position: [longitude, latitude], address}],
+            getPosition: d => d.position,
+            getFillColor: [255, 0, 0],
+            getRadius: 500,
+            pickable: true,
+            onClick: (info) => {
+              if (info.object && info.object.address) {
+                // Could show a tooltip or handle click
+                console.log(info.object.address)
+              }
+            }
+          })
+        ]
+      })
+
+      map.current?.addControl(deckOverlay)
+    })
+
+    return () => {
+      map.current?.remove()
+    }
+  }, [latitude, longitude, address])
 
   return (
-    <div style={{height: '300px'}} className="w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-      <DeckGL
-        initialViewState={INITIAL_VIEW_STATE}
-        controller={true}
-        layers={layers}
-      >
-        <Map 
-          mapLib={maplibregl}
-          mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-        />
-      </DeckGL>
-    </div>
+    <div 
+      ref={mapContainer} 
+      style={{height: '300px'}} 
+      className="w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"
+    />
   )
 }
