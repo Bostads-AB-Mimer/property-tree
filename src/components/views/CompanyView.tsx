@@ -2,6 +2,7 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Building2, Users, Home, Wallet } from 'lucide-react'
+import { PropertyList } from '../shared/PropertyList'
 import { companyService } from '../../services/api'
 import { ViewHeader } from '../shared/ViewHeader'
 import { Card } from '../ui/card'
@@ -90,24 +91,7 @@ export function CompanyView() {
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
         <div className="lg:col-span-2">
-          <Card title="Fastigheter" icon={Building2}>
-            <Grid cols={2}>
-              {company.properties?.map((property) => (
-                <motion.div
-                  key={property.id}
-                  whileHover={{ scale: 1.02 }}
-                  className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
-                >
-                  <h3 className="font-medium">{property.name}</h3>
-                  <p className="text-sm text-gray-500">{property.address}</p>
-                  <div className="mt-2 flex items-center text-sm text-gray-500">
-                    <Home className="h-4 w-4 mr-1" />
-                    <span>{property.totalApartments} lägenheter</span>
-                  </div>
-                </motion.div>
-              ))}
-            </Grid>
-          </Card>
+          <PropertyList properties={company.properties || []} />
         </div>
 
         <div className="space-y-6">
