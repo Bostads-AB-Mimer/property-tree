@@ -47,12 +47,29 @@ export function CompanyView() {
     )
   }
 
-  if (error || !company) {
+  if (error) {
+    console.error('Failed to load company:', error)
     return (
       <div className="p-8 text-center">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Företag hittades inte
+          Ett fel uppstod när företaget skulle hämtas
         </h2>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          Försök igen senare eller kontakta support om problemet kvarstår
+        </p>
+      </div>
+    )
+  }
+
+  if (!company) {
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Företaget kunde inte hittas
+        </h2>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">
+          Kontrollera att företags-ID är korrekt
+        </p>
       </div>
     )
   }
