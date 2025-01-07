@@ -40,7 +40,7 @@ export function PropertyMap({ latitude = 59.3293, longitude = 18.0686, address }
   ]
 
   return (
-    <div className="h-[300px] w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div style={{height: '300px'}} className="w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
       <DeckGL
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
