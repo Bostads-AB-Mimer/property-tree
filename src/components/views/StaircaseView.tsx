@@ -215,7 +215,7 @@ export function StaircaseView() {
           <Card title="Status" icon={Layers}>
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-2 opacity-50">
                   <span className="text-sm text-gray-500">Portkod</span>
                   <span className="text-sm font-medium">1234#</span>
                 </div>

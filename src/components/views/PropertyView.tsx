@@ -127,7 +127,7 @@ export function PropertyView() {
             <div className="space-y-4">
               <motion.div
                 whileHover={{ scale: 1.02 }}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer group"
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer group opacity-50"
                 onClick={() => navigate('/tenants/tenant-1')}
               >
                 <div className="flex items-center space-x-3">

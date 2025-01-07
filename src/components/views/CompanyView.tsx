@@ -120,7 +120,7 @@ export function CompanyView() {
         <div className="space-y-6">
           <Card title="Status" icon={Building2}>
             <div className="space-y-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg opacity-50">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm text-gray-500">Uthyrningsgrad</span>
                   <span className="text-sm font-medium text-green-500">
