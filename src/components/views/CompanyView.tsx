@@ -1,7 +1,8 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Building2, Users, Home, Wallet } from 'lucide-react'
+import { Building2, Users, Home, Wallet, MapPin } from 'lucide-react'
+import { PropertyMap } from '../shared/PropertyMap'
 import { PropertyList } from '../shared/PropertyList'
 import { companyService, propertyService } from '../../services/api'
 import { ViewHeader } from '../shared/ViewHeader'
@@ -123,6 +124,13 @@ export function CompanyView() {
               latitude={propertyQuery.data.latitude}
               longitude={propertyQuery.data.longitude}
               address={`${propertyQuery.data.designation}, ${propertyQuery.data.municipality}`}
+            />
+          </Card>
+          <Card title="Karta" icon={MapPin}>
+            <PropertyMap
+              latitude={59.3293}
+              longitude={18.0686}
+              address={company.name}
             />
           </Card>
           <Card title="Status" icon={Building2}>
