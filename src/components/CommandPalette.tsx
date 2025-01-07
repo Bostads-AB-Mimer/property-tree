@@ -15,12 +15,10 @@ import { propertyService } from '../services/api'
 import { useCommandPalette } from './hooks/useCommandPalette'
 
 const routeMap = {
-  area: '/areas',
   property: '/properties',
   building: '/buildings',
-  entrance: '/entrances',
-  apartment: '/apartments',
-  tenant: '/tenants',
+  staircase: '/staircases',
+  residence: '/residences'
 }
 
 const iconMap = {
@@ -43,9 +41,27 @@ export function CommandPalette() {
   React.useEffect(() => {
     const search = async () => {
       if (query.trim()) {
-        const searchResults = await propertyService.searchProperties(query)
-        setResults(searchResults)
-        setSelectedIndex(0)
+        try {
+          // Search across all entity types
+          const [propertyResults, buildingResults, residenceResults] = await Promise.all([
+            propertyService.searchProperties(query),
+            buildingService.searchBuildings(query),
+            residenceService.searchResidences(query)
+          ])
+
+          // Combine all results
+          const allResults = [
+            ...propertyResults,
+            ...buildingResults,
+            ...residenceResults
+          ]
+
+          setResults(allResults)
+          setSelectedIndex(0)
+        } catch (error) {
+          console.error('Search failed:', error)
+          setResults([])
+        }
       } else {
         setResults([])
       }
