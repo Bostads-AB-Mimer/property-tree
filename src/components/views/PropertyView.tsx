@@ -7,6 +7,7 @@ import {
   Home,
   Wrench,
   Users,
+  ArrowRight,
 } from 'lucide-react'
 import { BuildingList } from '../shared/BuildingList'
 import { propertyService, buildingService } from '../../services/api'
