@@ -2,6 +2,12 @@ import { Residence } from '../types'
 import { GET } from './baseApi'
 
 export const residenceService = {
+  // Get all residences
+  async getAll(): Promise<Residence[]> {
+    const { data, error } = await GET('/residences')
+    if (error) throw error
+    return data?.content || []
+  },
   async searchResidences(query: string): Promise<NavigationItem[]> {
     // In a real app this would be an API call
     // For now we'll search through all residences

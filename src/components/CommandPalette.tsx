@@ -34,39 +34,12 @@ export function CommandPalette() {
   const navigate = useNavigate()
   const { isOpen, close } = useCommandPalette()
   const [query, setQuery] = React.useState('')
-  const [results, setResults] = React.useState<NavigationItem[]>([])
   const [selectedIndex, setSelectedIndex] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const { results, isLoading } = useSearch(query)
 
   React.useEffect(() => {
-    const search = async () => {
-      if (query.trim()) {
-        try {
-          // Search across all entity types
-          const [propertyResults, buildingResults, residenceResults] = await Promise.all([
-            propertyService.searchProperties(query),
-            buildingService.searchBuildings(query),
-            residenceService.searchResidences(query)
-          ])
-
-          // Combine all results
-          const allResults = [
-            ...propertyResults,
-            ...buildingResults,
-            ...residenceResults
-          ]
-
-          setResults(allResults)
-          setSelectedIndex(0)
-        } catch (error) {
-          console.error('Search failed:', error)
-          setResults([])
-        }
-      } else {
-        setResults([])
-      }
-    }
-    search()
+    setSelectedIndex(0)
   }, [query])
 
   React.useEffect(() => {

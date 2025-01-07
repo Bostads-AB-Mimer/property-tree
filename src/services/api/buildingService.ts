@@ -4,6 +4,12 @@ import type { components } from './generated/api-types'
 type Building = components['schemas']['Building']
 
 export const buildingService = {
+  // Get all buildings
+  async getAll(): Promise<Building[]> {
+    const { data, error } = await GET('/buildings')
+    if (error) throw error
+    return data?.content || []
+  },
   async searchBuildings(query: string): Promise<NavigationItem[]> {
     // In a real app this would be an API call
     // For now we'll search through all buildings
