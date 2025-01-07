@@ -7,8 +7,8 @@ import {
   Home,
   Wrench,
   Users,
-  ArrowRight,
 } from 'lucide-react'
+import { BuildingList } from '../shared/BuildingList'
 import { propertyService, buildingService } from '../../services/api'
 import { ViewHeader } from '../shared/ViewHeader'
 import { Card } from '../ui/card'
@@ -105,28 +105,10 @@ export function PropertyView() {
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
         <div className="lg:col-span-2 space-y-6">
-          <Card title="Byggnader" icon={Building2}>
-            <div className="space-y-4">
-              {buildingsQuery.data?.map((building) => (
-                <motion.div
-                  key={building.id}
-                  whileHover={{ scale: 1.02 }}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer group"
-                  onClick={() => navigate(`/buildings/${building.id}`)}
-                >
-                  <div>
-                    <h3 className="font-medium group-hover:text-blue-500 transition-colors">
-                      {building.name}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {building.buildingType.name}
-                    </p>
-                  </div>
-                  <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                </motion.div>
-              ))}
-            </div>
-          </Card>
+          <BuildingList 
+            buildings={buildingsQuery.data || []}
+            icon={Building2}
+          />
 
           <Card title="Historik" icon={Calendar}>
             <div className="space-y-4">
