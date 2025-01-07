@@ -9,7 +9,7 @@ import {
   Users,
   ArrowRight,
 } from 'lucide-react'
-import { propertyService } from '../../services/api'
+import { propertyService, buildingService } from '../../services/api'
 import { ViewHeader } from '../shared/ViewHeader'
 import { Card } from '../ui/card'
 import { Grid } from '../ui/grid'
@@ -18,17 +18,19 @@ import { StatCard } from '../shared/StatCard'
 export function PropertyView() {
   const { propertyId } = useParams<{ propertyId: string }>()
   const navigate = useNavigate()
-  const {
-    data: property,
-    isLoading,
-    error,
-  } = useQuery({
+  const propertyQuery = useQuery({
     queryKey: ['property', propertyId],
     queryFn: () => propertyService.getPropertyById(propertyId!),
     enabled: !!propertyId,
   })
 
-  if (isLoading) {
+  const buildingsQuery = useQuery({
+    queryKey: ['buildings', propertyId],
+    queryFn: () => buildingService.getByPropertyCode(propertyId!),
+    enabled: !!propertyId,
+  })
+
+  if (propertyQuery.isLoading || buildingsQuery.isLoading) {
     return (
       <div className="p-8 animate-in">
         <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 animate-pulse" />
@@ -53,7 +55,7 @@ export function PropertyView() {
     )
   }
 
-  if (error || !property) {
+  if (propertyQuery.error || !propertyQuery.data) {
     return (
       <div className="p-8 text-center">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
@@ -66,8 +68,8 @@ export function PropertyView() {
   return (
     <div className="p-8 animate-in">
       <ViewHeader
-        title={property.designation}
-        subtitle={`${property.municipality}, ${property.tract}`}
+        title={propertyQuery.data.designation}
+        subtitle={`${propertyQuery.data.municipality}, ${propertyQuery.data.tract}`}
         type="Fastighet"
         icon={Building2}
       />
@@ -75,23 +77,23 @@ export function PropertyView() {
       <Grid cols={4} className="mb-8">
         <StatCard
           title="Lägenheter"
-          value={property.totalApartments}
+          value={propertyQuery.data.totalApartments}
           icon={Home}
-          subtitle={`${property.occupiedApartments} uthyrda`}
+          subtitle={`${propertyQuery.data.occupiedApartments} uthyrda`}
         />
         <StatCard
           title="Byggnader"
-          value={property._links?.buildings ? '1+' : '0'}
+          value={buildingsQuery.data?.length || 0}
           icon={Building2}
         />
         <StatCard
           title="Registreringsdatum"
-          value={property.registrationDate || 'Ej angivet'}
+          value={propertyQuery.data.registrationDate || 'Ej angivet'}
           icon={Calendar}
         />
         <StatCard
           title="Fastighetsnummer"
-          value={property.propertyTaxNumber || 'Ej angivet'}
+          value={propertyQuery.data.propertyTaxNumber || 'Ej angivet'}
           icon={Wrench}
         />
       </Grid>
@@ -104,8 +106,25 @@ export function PropertyView() {
       >
         <div className="lg:col-span-2 space-y-6">
           <Card title="Byggnader" icon={Building2}>
-            <div className="p-4 text-sm text-gray-500">
-              Klicka på fastigheten i sidomenyn för att visa byggnader
+            <div className="space-y-4">
+              {buildingsQuery.data?.map((building) => (
+                <motion.div
+                  key={building.id}
+                  whileHover={{ scale: 1.02 }}
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer group"
+                  onClick={() => navigate(`/buildings/${building.id}`)}
+                >
+                  <div>
+                    <h3 className="font-medium group-hover:text-blue-500 transition-colors">
+                      {building.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {building.buildingType.name}
+                    </p>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                </motion.div>
+              ))}
             </div>
           </Card>
 
