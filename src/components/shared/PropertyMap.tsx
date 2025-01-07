@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { geocodingService } from '@/services/api/geocodingService'
 import { Map } from 'maplibre-gl'
 import { MapboxOverlay } from '@deck.gl/mapbox'
 import { ScatterplotLayer } from '@deck.gl/layers'
@@ -15,21 +16,39 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<Map | null>(null)
 
-  // Calculate bounds for all properties
-  const bounds = properties.reduce((acc, property) => {
-    // Mock coordinates - in a real app these would come from the API
-    const lat = 59.3293 + (Math.random() - 0.5) * 0.1
-    const lng = 18.0686 + (Math.random() - 0.5) * 0.1
-    
-    if (!acc) {
-      return [[lng, lat], [lng, lat]]
+  const [coordinates, setCoordinates] = React.useState<Array<[number, number]>>([])
+  const [bounds, setBounds] = React.useState<[[number, number], [number, number]] | null>(null)
+
+  useEffect(() => {
+    const fetchCoordinates = async () => {
+      const coords = await Promise.all(
+        properties.map(async (property) => {
+          const searchQuery = `${property.designation}, ${property.municipality}, Sweden`
+          const result = await geocodingService.searchAddress(searchQuery)
+          return result || [18.0686, 59.3293] // Fallback to Stockholm if geocoding fails
+        })
+      )
+      
+      setCoordinates(coords)
+      
+      // Calculate bounds from real coordinates
+      if (coords.length > 0) {
+        const newBounds = coords.reduce((acc, [lng, lat]) => {
+          if (!acc) {
+            return [[lng, lat], [lng, lat]]
+          }
+          return [
+            [Math.min(acc[0][0], lng), Math.min(acc[0][1], lat)],
+            [Math.max(acc[1][0], lng), Math.max(acc[1][1], lat)]
+          ]
+        }, null as [[number, number], [number, number]] | null)
+        
+        setBounds(newBounds)
+      }
     }
-    
-    return [
-      [Math.min(acc[0][0], lng), Math.min(acc[0][1], lat)],
-      [Math.max(acc[1][0], lng), Math.max(acc[1][1], lat)]
-    ]
-  }, null as [[number, number], [number, number]] | null)
+
+    fetchCoordinates()
+  }, [properties])
 
   useEffect(() => {
     if (!mapContainer.current) return
@@ -42,12 +61,8 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
     })
 
     map.current.once('load', () => {
-      // Convert properties to map points
-      const points = properties.map(property => ({
-        position: [
-          18.0686 + (Math.random() - 0.5) * 0.1, // Mock longitude
-          59.3293 + (Math.random() - 0.5) * 0.1,  // Mock latitude
-        ],
+      const points = properties.map((property, index) => ({
+        position: coordinates[index],
         property: property
       }))
 
