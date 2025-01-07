@@ -26,9 +26,9 @@ export function PropertyView() {
   })
 
   const buildingsQuery = useQuery({
-    queryKey: ['buildings', propertyId],
-    queryFn: () => buildingService.getByPropertyCode(propertyId!),
-    enabled: !!propertyId,
+    queryKey: ['buildings', propertyQuery.data?.code],
+    queryFn: () => buildingService.getByPropertyCode(propertyQuery.data!.code),
+    enabled: !!propertyQuery.data?.code,
   })
 
   if (propertyQuery.isLoading || buildingsQuery.isLoading) {
