@@ -94,7 +94,7 @@ export function PropertyView() {
         />
         <StatCard
           title="Fastighetsnummer"
-          value={propertyQuery.data.propertyTaxNumber || 'Ej angivet'}
+          value={propertyQuery.data.propertyIndexNumber || 'Ej angivet'}
           icon={Wrench}
         />
       </Grid>
