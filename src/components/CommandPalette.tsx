@@ -36,23 +36,16 @@ export function CommandPalette() {
   const { isOpen, close } = useCommandPalette()
   const [query, setQuery] = React.useState('')
   const [selectedIndex, setSelectedIndex] = React.useState(0)
-  const [results, setResults] = React.useState<NavigationItem[]>([])
   const inputRef = React.useRef<HTMLInputElement>(null)
-  const { results: searchResults, isLoading } = useSearch(query)
+  const { results, isLoading } = useSearch(query)
 
   React.useEffect(() => {
     setSelectedIndex(0)
   }, [query])
 
-  // Update results when search results change
-  React.useEffect(() => {
-    setResults(searchResults || [])
-  }, [searchResults])
-
   React.useEffect(() => {
     if (isOpen) {
       setQuery('')
-      setResults([])
       setSelectedIndex(0)
       requestAnimationFrame(() => {
         inputRef.current?.focus()
