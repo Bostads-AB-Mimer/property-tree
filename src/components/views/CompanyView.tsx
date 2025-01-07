@@ -13,15 +13,21 @@ import { useQuery } from '@tanstack/react-query'
 
 export function CompanyView() {
   const { companyId } = useParams()
-  const {
-    data: company,
-    isLoading,
-    error,
-  } = useQuery({
+  const companyQuery = useQuery({
     queryKey: ['company', companyId],
     queryFn: () => companyService.getById(companyId!),
     enabled: !!companyId,
   })
+
+  const propertiesQuery = useQuery({
+    queryKey: ['properties', companyId],
+    queryFn: () => propertyService.getFromCompany(companyQuery.data!),
+    enabled: !!companyQuery.data,
+  })
+
+  const isLoading = companyQuery.isLoading || propertiesQuery.isLoading
+  const error = companyQuery.error || propertiesQuery.error
+  const company = companyQuery.data
 
   if (isLoading) {
     return (
@@ -91,7 +97,7 @@ export function CompanyView() {
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
         <div className="lg:col-span-2">
-          <PropertyList properties={company.properties || []} />
+          <PropertyList properties={propertiesQuery.data || []} />
         </div>
 
         <div className="space-y-6">
