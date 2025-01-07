@@ -118,6 +118,13 @@ export function CompanyView() {
         </div>
 
         <div className="space-y-6">
+          <Card title="Karta" icon={MapPin}>
+            <PropertyMap
+              latitude={propertyQuery.data.latitude}
+              longitude={propertyQuery.data.longitude}
+              address={`${propertyQuery.data.designation}, ${propertyQuery.data.municipality}`}
+            />
+          </Card>
           <Card title="Status" icon={Building2}>
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg opacity-50">
