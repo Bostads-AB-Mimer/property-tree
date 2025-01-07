@@ -10,6 +10,7 @@ import {
   ArrowRight,
   User2,
 } from 'lucide-react'
+import { useSearch } from './hooks/useSearch'
 import { NavigationItem } from '../services/types'
 import { propertyService } from '../services/api'
 import { useCommandPalette } from './hooks/useCommandPalette'
