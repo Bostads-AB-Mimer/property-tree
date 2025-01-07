@@ -121,16 +121,9 @@ export function CompanyView() {
         <div className="space-y-6">
           <Card title="Karta" icon={MapPin}>
             <PropertyMap
-              latitude={propertyQuery.data.latitude}
-              longitude={propertyQuery.data.longitude}
-              address={`${propertyQuery.data.designation}, ${propertyQuery.data.municipality}`}
-            />
-          </Card>
-          <Card title="Karta" icon={MapPin}>
-            <PropertyMap
               latitude={59.3293}
               longitude={18.0686}
-              address={company.name}
+              address={`${company.name} (${company.properties?.length || 0} fastigheter)`}
             />
           </Card>
           <Card title="Status" icon={Building2}>
