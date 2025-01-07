@@ -1,15 +1,9 @@
 import React from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
-
-// Fix for default marker icons in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-})
+import DeckGL from '@deck.gl/react'
+import { ScatterplotLayer } from '@deck.gl/layers'
+import { Map } from 'react-map-gl'
+import maplibregl from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
 
 interface PropertyMapProps {
   latitude?: number
@@ -18,22 +12,45 @@ interface PropertyMapProps {
 }
 
 export function PropertyMap({ latitude = 59.3293, longitude = 18.0686, address }: PropertyMapProps) {
+  const INITIAL_VIEW_STATE = {
+    latitude,
+    longitude,
+    zoom: 13,
+    pitch: 0,
+    bearing: 0
+  }
+
+  const layers = [
+    new ScatterplotLayer({
+      id: 'property',
+      data: [{position: [longitude, latitude], address}],
+      pickable: true,
+      opacity: 0.8,
+      stroked: true,
+      filled: true,
+      radiusScale: 6,
+      radiusMinPixels: 5,
+      radiusMaxPixels: 100,
+      lineWidthMinPixels: 1,
+      getPosition: d => d.position,
+      getFillColor: [255, 0, 0],
+      getLineColor: [0, 0, 0],
+      getTooltip: ({object}) => object && object.address
+    })
+  ]
+
   return (
     <div className="h-[300px] w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-      <MapContainer
-        center={[latitude, longitude]}
-        zoom={13}
-        scrollWheelZoom={false}
-        style={{ height: '100%', width: '100%' }}
+      <DeckGL
+        initialViewState={INITIAL_VIEW_STATE}
+        controller={true}
+        layers={layers}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        <Map 
+          mapLib={maplibregl}
+          mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         />
-        <Marker position={[latitude, longitude]}>
-          {address && <Popup>{address}</Popup>}
-        </Marker>
-      </MapContainer>
+      </DeckGL>
     </div>
   )
 }
