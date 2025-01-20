@@ -16,33 +16,43 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<Map | null>(null)
 
-  const [coordinates, setCoordinates] = React.useState<Array<[number, number]>>([])
-  const [bounds, setBounds] = React.useState<[[number, number], [number, number]] | null>(null)
+  const [coordinates, setCoordinates] = React.useState<Array<[number, number]>>(
+    []
+  )
+  const [bounds, setBounds] = React.useState<
+    [[number, number], [number, number]] | null
+  >(null)
 
   useEffect(() => {
     const fetchCoordinates = async () => {
-      const coords = await Promise.all(
-        properties.map(async (property) => {
-          const searchQuery = `${property.designation}, ${property.municipality}, Sweden`
-          const result = await geocodingService.searchAddress(searchQuery)
-          return result || [18.0686, 59.3293] // Fallback to Stockholm if geocoding fails
-        })
-      )
-      
+      const coords = await properties.reduce(async (lastPromise, property) => {
+        const accumulatedCoords = await lastPromise
+        const searchQuery = `${property.designation}, ${property.municipality}, Sweden`
+        const result = await geocodingService.searchAddress(searchQuery)
+        const coords = result || [18.0686, 59.3293] // Fallback to Stockholm if geocoding fails
+        return [...accumulatedCoords, coords]
+      }, Promise.resolve([]))
+
       setCoordinates(coords)
-      
+
       // Calculate bounds from real coordinates
       if (coords.length > 0) {
-        const newBounds = coords.reduce((acc, [lng, lat]) => {
-          if (!acc) {
-            return [[lng, lat], [lng, lat]]
-          }
-          return [
-            [Math.min(acc[0][0], lng), Math.min(acc[0][1], lat)],
-            [Math.max(acc[1][0], lng), Math.max(acc[1][1], lat)]
-          ]
-        }, null as [[number, number], [number, number]] | null)
-        
+        const newBounds = coords.reduce(
+          (acc, [lng, lat]) => {
+            if (!acc) {
+              return [
+                [lng, lat],
+                [lng, lat],
+              ]
+            }
+            return [
+              [Math.min(acc[0][0], lng), Math.min(acc[0][1], lat)],
+              [Math.max(acc[1][0], lng), Math.max(acc[1][1], lat)],
+            ]
+          },
+          null as [[number, number], [number, number]] | null
+        )
+
         setBounds(newBounds)
       }
     }
@@ -57,13 +67,13 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
       container: mapContainer.current,
       style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
       center: [18.0686, 59.3293], // Stockholm
-      zoom: 11
+      zoom: 11,
     })
 
     map.current.once('load', () => {
       const points = properties.map((property, index) => ({
         position: coordinates[index],
-        property: property
+        property: property,
       }))
 
       const deckOverlay = new MapboxOverlay({
@@ -72,20 +82,23 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
           new ScatterplotLayer({
             id: 'properties',
             data: points,
-            getPosition: d => d.position,
+            getPosition: (d) => d.position,
             getFillColor: [65, 105, 225], // Royal blue
             getRadius: 300,
             pickable: true,
             onClick: (info) => {
               if (info.object && info.object.property) {
-                console.log('Clicked property:', info.object.property.designation)
+                console.log(
+                  'Clicked property:',
+                  info.object.property.designation
+                )
               }
             },
             updateTriggers: {
-              getFillColor: points
-            }
-          })
-        ]
+              getFillColor: points,
+            },
+          }),
+        ],
       })
 
       map.current?.addControl(deckOverlay)
@@ -94,7 +107,7 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
       if (bounds) {
         map.current.fitBounds(bounds, {
           padding: 50,
-          maxZoom: 15
+          maxZoom: 15,
         })
       }
     })
@@ -105,9 +118,9 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   }, [properties, bounds])
 
   return (
-    <div 
-      ref={mapContainer} 
-      style={{height: '300px'}} 
+    <div
+      ref={mapContainer}
+      style={{ height: '300px' }}
       className="w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"
     />
   )
