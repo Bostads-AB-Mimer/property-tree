@@ -52,16 +52,26 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   }, [properties])
 
   useEffect(() => {
-    if (!mapContainer.current) return
+    if (!mapContainer.current || map.current) return
 
-    if (!map.current) {
-      map.current = new Map({
-        container: mapContainer.current,
-        style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-        center: [16.5455, 59.6099], // Västerås
-        zoom: 11,
-      })
+    const mapInstance = new Map({
+      container: mapContainer.current,
+      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      center: [16.5455, 59.6099], // Västerås
+      zoom: 11,
+      antialias: true
+    })
+
+    map.current = mapInstance
+
+    return () => {
+      mapInstance.remove()
+      map.current = null
     }
+  }, [])
+
+  useEffect(() => {
+    if (!map.current) return
 
     const points = properties
       .filter(property => propertyCoordinates.has(property.id))
@@ -100,7 +110,7 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
         map.current.removeControl(deckOverlay)
       }
     }
-  }, [properties, coordinates])
+  }, [properties, propertyCoordinates])
 
   return (
     <div className="relative">
