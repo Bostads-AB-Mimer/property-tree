@@ -7,7 +7,6 @@ import {
 import { NavigationItem } from '@/services/types'
 
 export function useSearch(query: string) {
-  return
   // Pre-fetch and cache all searchable items
   const prefetchQuery = useQuery({
     queryKey: ['searchItems'],

@@ -2,7 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Building, DoorClosed, Home, Users, ArrowRight } from 'lucide-react'
-import { buildingService, residenceService, staircaseService } from '../../services/api'
+import {
+  buildingService,
+  residenceService,
+  staircaseService,
+} from '../../services/api'
 import { Building as BuildingType } from '../../services/types'
 import { StatCard } from '../shared/StatCard'
 import { ViewHeader } from '../shared/ViewHeader'
@@ -31,8 +35,12 @@ export function BuildingView() {
     enabled: !!buildingQuery.data?.code,
   })
 
-  const isLoading = buildingQuery.isLoading || residencesQuery.isLoading || staircasesQuery.isLoading
-  const error = buildingQuery.error || residencesQuery.error || staircasesQuery.error
+  const isLoading =
+    buildingQuery.isLoading ||
+    residencesQuery.isLoading ||
+    staircasesQuery.isLoading
+  const error =
+    buildingQuery.error || residencesQuery.error || staircasesQuery.error
   const building = buildingQuery.data
 
   if (isLoading) {
@@ -87,13 +95,16 @@ export function BuildingView() {
           subtitle={`${residencesQuery.data?.filter((r) => !r.deleted).length || 0} aktiva`}
         />
         <StatCard
-          title="Uppgångar"
-          value={building.entrances?.length}
+          title="Byggår"
+          value={building.construction.constructionYear}
           icon={DoorClosed}
         />
         <StatCard
-          title="Uthyrningsgrad"
-          value={`${Math.round(((residencesQuery.data?.filter((r) => !r.deleted).length || 0) / (residencesQuery.data?.length || 1)) * 100)}%`}
+          title="Senast renoverad"
+          value={building.construction.renovationYear}
+          subtitle={
+            (building.construction.valueYear && ' (värdeår)') || undefined
+          }
           icon={Users}
         />
         <StatCard
@@ -117,17 +128,21 @@ export function BuildingView() {
                   <motion.div
                     key={staircase.id}
                     whileHover={{ scale: 1.02 }}
-                    onClick={() => navigate(`/staircases/${building.code}/${staircase.id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/staircases/${building.code.trim()}/${staircase.id.trim()}`
+                      )
+                    }
                     className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer group"
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium group-hover:text-blue-500 transition-colors">
-                          {staircase.name || `Uppgång ${staircase.code}`}
+                          {`Uppgång ${staircase.code}`}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          {residencesQuery.data?.filter(
-                            (r) => r.entrance === staircase.code
+                          {residencesQuery.data?.filter((r) =>
+                            r.code.startsWith(staircase.code.trim())
                           ).length || 0}{' '}
                           lägenheter
                         </p>
@@ -154,7 +169,7 @@ export function BuildingView() {
                           {residence.name}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          Uppgång {residence.entrance}
+                          Uppgång {residence.code.substring(0, 2)}
                         </p>
                       </div>
                       <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
