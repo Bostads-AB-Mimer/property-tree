@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { geocodingQueue } from '@/utils/geocodingQueue'
 import { Map } from 'maplibre-gl'
+import { Expand, Minimize2 } from 'lucide-react'
 import { MapboxOverlay } from '@deck.gl/mapbox'
 import { ScatterplotLayer } from '@deck.gl/layers'
 import 'maplibre-gl/dist/maplibre-gl.css'
@@ -22,6 +23,7 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   const [bounds, setBounds] = React.useState<
     [[number, number], [number, number]] | null
   >(null)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     const fetchCoordinates = async () => {
@@ -116,10 +118,25 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   }, [properties, bounds])
 
   return (
-    <div
-      ref={mapContainer}
-      style={{ height: '300px' }}
-      className="w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700"
-    />
+    <div className="relative">
+      <div
+        ref={mapContainer}
+        style={{ height: isExpanded ? '80vh' : '300px' }}
+        className={`w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out ${
+          isExpanded ? 'fixed top-4 left-4 right-4 z-50' : ''
+        }`}
+      />
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="absolute top-2 right-2 p-2 bg-white rounded-md shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 z-50"
+        aria-label={isExpanded ? 'Minimize map' : 'Expand map'}
+      >
+        {isExpanded ? (
+          <Minimize2 className="w-4 h-4" />
+        ) : (
+          <Expand className="w-4 h-4" />
+        )}
+      </button>
+    </div>
   )
 }
