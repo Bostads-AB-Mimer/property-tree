@@ -13,13 +13,13 @@ interface PropertyMapProps {
   companyName?: string
 }
 
-export function PropertyMap({ properties, companyName }: PropertyMapProps) {
+export function PropertyMap({ properties }: PropertyMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<Map | null>(null)
 
-  const [propertyCoordinates, setPropertyCoordinates] = React.useState<
-    Map<string, [number, number]>
-  >(new Map())
+  const [propertyCoordinates, setPropertyCoordinates] = useState(
+    new Map<string, [number, number]>()
+  )
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
@@ -27,27 +27,28 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
 
     properties.forEach((property) => {
       if (processedProperties.has(property.id)) return
-      
+
       const searchQuery = `${property.designation}, ${property.municipality}, Sweden`
-      
+
       geocodingQueue.add(
         searchQuery,
         (coords) => {
-          setPropertyCoordinates(prev => {
+          setPropertyCoordinates((prev) => {
             const newMap = new Map(prev)
             newMap.set(property.id, coords)
             return newMap
           })
         },
-        (error) => console.error(`Geocoding error for ${property.designation}:`, error)
+        (error) =>
+          console.error(`Geocoding error for ${property.designation}:`, error)
       )
-      
+
       processedProperties.add(property.id)
     })
 
     // Cleanup function to reset coordinates when properties change
     return () => {
-      setPropertyCoordinates(new Map())
+      setPropertyCoordinates({})
     }
   }, [properties])
 
@@ -59,10 +60,10 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
       try {
         const mapInstance = new Map({
           container: mapContainer.current,
-          style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+          style:
+            'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
           center: [16.5455, 59.6099], // Västerås
           zoom: 11,
-          antialias: true
         })
 
         map.current = mapInstance
@@ -91,8 +92,8 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
     if (!map.current) return
 
     const points = properties
-      .filter(property => propertyCoordinates.has(property.id))
-      .map(property => ({
+      .filter((property) => propertyCoordinates.has(property.id))
+      .map((property) => ({
         position: propertyCoordinates.get(property.id)!,
         property: property,
       }))
@@ -109,10 +110,7 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
           pickable: true,
           onClick: (info) => {
             if (info.object && info.object.property) {
-              console.log(
-                'Clicked property:',
-                info.object.property.designation
-              )
+              console.log('Clicked property:', info.object.property.designation)
             }
           },
         }),
