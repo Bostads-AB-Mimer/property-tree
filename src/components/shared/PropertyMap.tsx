@@ -99,7 +99,7 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
     return () => {
       map.current?.remove()
     }
-  }, [properties, bounds])
+  }, [properties])
 
   return (
     <div className="relative">
