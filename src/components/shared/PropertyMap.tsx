@@ -26,38 +26,52 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
-    const fetchCoordinates = async () => {
-      const coords = await Promise.all(
-        properties.map(async (property) => {
-          const searchQuery = `${property.designation}, ${property.municipality}, Sweden`
-          return geocodingQueue.add(searchQuery)
-        })
+    const processedProperties = new Set<string>()
+
+    properties.forEach((property) => {
+      if (processedProperties.has(property.id)) return
+      
+      const searchQuery = `${property.designation}, ${property.municipality}, Sweden`
+      
+      geocodingQueue.add(
+        searchQuery,
+        (coords) => {
+          setCoordinates(prev => {
+            const newCoords = [...prev, coords]
+            
+            // Update bounds with new coordinate
+            if (newCoords.length === 1) {
+              setBounds([[coords[0], coords[1]], [coords[0], coords[1]]])
+            } else {
+              setBounds(prevBounds => {
+                if (!prevBounds) return [[coords[0], coords[1]], [coords[0], coords[1]]]
+                return [
+                  [
+                    Math.min(prevBounds[0][0], coords[0]),
+                    Math.min(prevBounds[0][1], coords[1])
+                  ],
+                  [
+                    Math.max(prevBounds[1][0], coords[0]),
+                    Math.max(prevBounds[1][1], coords[1])
+                  ]
+                ]
+              })
+            }
+            
+            return newCoords
+          })
+        },
+        (error) => console.error(`Geocoding error for ${property.designation}:`, error)
       )
+      
+      processedProperties.add(property.id)
+    })
 
-      setCoordinates(coords)
-
-      // Calculate bounds from real coordinates
-      if (coords.length > 0) {
-        const initialBounds: [[number, number], [number, number]] = [
-          [coords[0][0], coords[0][1]],
-          [coords[0][0], coords[0][1]]
-        ]
-        
-        const newBounds = coords.reduce<[[number, number], [number, number]]>(
-          (acc, [lng, lat]) => {
-            return [
-              [Math.min(acc[0][0], lng), Math.min(acc[0][1], lat)],
-              [Math.max(acc[1][0], lng), Math.max(acc[1][1], lat)]
-            ]
-          },
-          initialBounds
-        )
-
-        setBounds(newBounds)
-      }
+    // Cleanup function to reset coordinates when properties change
+    return () => {
+      setCoordinates([])
+      setBounds(null)
     }
-
-    fetchCoordinates()
   }, [properties])
 
   useEffect(() => {

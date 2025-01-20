@@ -9,11 +9,17 @@ class GeocodingQueue {
   private processing = false
   private readonly delay = 200 // 200ms between requests
 
-  async add(address: string): Promise<[number, number]> {
-    return new Promise((resolve, reject) => {
-      this.queue.push({ address, resolve, reject })
-      this.processQueue()
+  async add(
+    address: string,
+    onResult: (result: [number, number]) => void,
+    onError: (error: Error) => void
+  ): void {
+    this.queue.push({ 
+      address, 
+      resolve: onResult, 
+      reject: onError 
     })
+    this.processQueue()
   }
 
   private async processQueue() {
