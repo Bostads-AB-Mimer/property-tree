@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { geocodingService } from '@/services/api/geocodingService'
+import { geocodingQueue } from '@/utils/geocodingQueue'
 import { Map } from 'maplibre-gl'
 import { MapboxOverlay } from '@deck.gl/mapbox'
 import { ScatterplotLayer } from '@deck.gl/layers'
@@ -25,13 +25,12 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
 
   useEffect(() => {
     const fetchCoordinates = async () => {
-      const coords = await properties.reduce(async (lastPromise, property) => {
-        const accumulatedCoords = await lastPromise
-        const searchQuery = `${property.designation}, ${property.municipality}, Sweden`
-        const result = await geocodingService.searchAddress(searchQuery)
-        const coords = result || [18.0686, 59.3293] // Fallback to Stockholm if geocoding fails
-        return [...accumulatedCoords, coords]
-      }, Promise.resolve([]))
+      const coords = await Promise.all(
+        properties.map(async (property) => {
+          const searchQuery = `${property.designation}, ${property.municipality}, Sweden`
+          return geocodingQueue.add(searchQuery)
+        })
+      )
 
       setCoordinates(coords)
 
