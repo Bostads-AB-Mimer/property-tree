@@ -52,21 +52,38 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   }, [properties])
 
   useEffect(() => {
-    if (!mapContainer.current || map.current) return
+    // Wait for next tick to ensure container is mounted
+    const timer = setTimeout(() => {
+      if (!mapContainer.current || map.current) return
 
-    const mapInstance = new Map({
-      container: mapContainer.current,
-      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-      center: [16.5455, 59.6099], // Västerås
-      zoom: 11,
-      antialias: true
-    })
+      try {
+        const mapInstance = new Map({
+          container: mapContainer.current,
+          style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+          center: [16.5455, 59.6099], // Västerås
+          zoom: 11,
+          antialias: true
+        })
 
-    map.current = mapInstance
+        map.current = mapInstance
+
+        return () => {
+          if (mapInstance) {
+            mapInstance.remove()
+            map.current = null
+          }
+        }
+      } catch (error) {
+        console.error('Failed to initialize map:', error)
+      }
+    }, 0)
 
     return () => {
-      mapInstance.remove()
-      map.current = null
+      clearTimeout(timer)
+      if (map.current) {
+        map.current.remove()
+        map.current = null
+      }
     }
   }, [])
 
