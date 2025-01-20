@@ -1,22 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
-import { propertyService, buildingService, residenceService } from '@/services/api'
+import {
+  propertyService,
+  buildingService,
+  residenceService,
+} from '@/services/api'
 import { NavigationItem } from '@/services/types'
 
 export function useSearch(query: string) {
+  return
   // Pre-fetch and cache all searchable items
   const prefetchQuery = useQuery({
     queryKey: ['searchItems'],
     queryFn: async () => {
-      const [properties, buildings, residences] = await Promise.all([
-        propertyService.getAll(),
-        buildingService.getAll(), 
-        residenceService.getAll()
+      const [/*properties, */ buildings, residences] = await Promise.all([
+        //propertyService.getAll(),
+        Promise.resolve([]),
+        buildingService.getAll(),
+        residenceService.getAll(),
       ])
 
       return {
         properties,
         buildings,
-        residences
+        residences,
       }
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
@@ -32,7 +38,7 @@ export function useSearch(query: string) {
       const results: NavigationItem[] = []
 
       // Search properties
-      prefetchQuery.data.properties.forEach(property => {
+      prefetchQuery.data.properties.forEach((property) => {
         if (
           property.designation.toLowerCase().includes(searchTerm) ||
           property.code.toLowerCase().includes(searchTerm)
@@ -41,13 +47,13 @@ export function useSearch(query: string) {
             id: property.id,
             name: property.designation,
             type: 'property',
-            metadata: { propertyId: property.id }
+            metadata: { propertyId: property.id },
           })
         }
       })
 
       // Search buildings
-      prefetchQuery.data.buildings.forEach(building => {
+      prefetchQuery.data.buildings.forEach((building) => {
         if (
           building.name.toLowerCase().includes(searchTerm) ||
           building.code.toLowerCase().includes(searchTerm)
@@ -56,13 +62,13 @@ export function useSearch(query: string) {
             id: building.id,
             name: building.name,
             type: 'building',
-            metadata: { buildingId: building.id }
+            metadata: { buildingId: building.id },
           })
         }
       })
 
       // Search residences
-      prefetchQuery.data.residences.forEach(residence => {
+      prefetchQuery.data.residences.forEach((residence) => {
         if (
           residence.name.toLowerCase().includes(searchTerm) ||
           residence.code.toLowerCase().includes(searchTerm)
@@ -71,7 +77,7 @@ export function useSearch(query: string) {
             id: residence.id,
             name: `${residence.name} (${residence.code})`,
             type: 'residence',
-            metadata: { residenceId: residence.id }
+            metadata: { residenceId: residence.id },
           })
         }
       })
@@ -84,6 +90,6 @@ export function useSearch(query: string) {
   return {
     results: searchQuery.data || [],
     isLoading: prefetchQuery.isLoading || searchQuery.isLoading,
-    error: prefetchQuery.error || searchQuery.error
+    error: prefetchQuery.error || searchQuery.error,
   }
 }

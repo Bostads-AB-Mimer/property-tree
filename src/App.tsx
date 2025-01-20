@@ -44,11 +44,8 @@ const queryClient = new QueryClient({
 })
 
 function AppContent() {
-  const { open: openCommandPalette } = useCommandPalette()
-
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-900">
-      <CommandPalette />
       <SidebarProvider>
         <SidebarNavigation />
         <SidebarInset>
@@ -59,7 +56,9 @@ function AppContent() {
               <BreadcrumbList>
                 {useBreadcrumb().items.map((item, index) => (
                   <BreadcrumbItem key={item.href}>
-                    <BreadcrumbPage href={item.href}>{item.label}</BreadcrumbPage>
+                    <BreadcrumbPage href={item.href}>
+                      {item.label}
+                    </BreadcrumbPage>
                   </BreadcrumbItem>
                 ))}
               </BreadcrumbList>

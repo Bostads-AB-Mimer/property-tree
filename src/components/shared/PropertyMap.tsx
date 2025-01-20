@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { geocodingQueue } from '@/utils/geocodingQueue'
-import { Map } from 'maplibre-gl'
+import { Map as GeoMap } from 'maplibre-gl'
 import { Expand, Minimize2 } from 'lucide-react'
 import { MapboxOverlay } from '@deck.gl/mapbox'
 import { ScatterplotLayer } from '@deck.gl/layers'
@@ -15,11 +15,11 @@ interface PropertyMapProps {
 
 export function PropertyMap({ properties }: PropertyMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
-  const map = useRef<Map | null>(null)
+  const map = useRef<GeoMap | null>(null)
 
-  const [propertyCoordinates, setPropertyCoordinates] = useState<Map<string, [number, number]>>(
-    new Map()
-  )
+  const [propertyCoordinates, setPropertyCoordinates] = useState<
+    Map<string, [number, number]>
+  >(new Map())
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
@@ -59,15 +59,14 @@ export function PropertyMap({ properties }: PropertyMapProps) {
       if (map.current) return
 
       try {
-        map.current = new Map({
+        map.current = new GeoMap({
           container: mapContainer.current!,
-          style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+          style:
+            'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
           center: [16.5455, 59.6099], // Västerås
           zoom: 11,
-          antialias: true,
-          preserveDrawingBuffer: true,
           maxZoom: 20,
-          renderWorldCopies: false
+          renderWorldCopies: false,
         })
       } catch (error) {
         console.error('Failed to initialize map:', error)

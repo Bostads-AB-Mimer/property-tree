@@ -15,20 +15,22 @@ export const buildingService = {
     // For now we'll search through all buildings
     const { data, error } = await GET('/buildings')
     if (error) throw error
-    
+
     const buildings = data.content || []
     const results: NavigationItem[] = []
 
     buildings.forEach((building) => {
-      if (building.name.toLowerCase().includes(query.toLowerCase()) ||
-          building.code.toLowerCase().includes(query.toLowerCase())) {
+      if (
+        building.name.toLowerCase().includes(query.toLowerCase()) ||
+        building.code.toLowerCase().includes(query.toLowerCase())
+      ) {
         results.push({
           id: building.id,
           name: building.name,
           type: 'building',
           metadata: {
-            buildingId: building.id
-          }
+            buildingId: building.id,
+          },
         })
       }
     })
