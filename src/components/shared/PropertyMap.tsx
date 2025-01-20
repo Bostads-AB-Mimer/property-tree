@@ -54,52 +54,61 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   useEffect(() => {
     if (!mapContainer.current) return
 
-    map.current = new Map({
-      container: mapContainer.current,
-      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-      center: [16.5455, 59.6099], // Västerås
-      zoom: 11,
-    })
+    if (!map.current) {
+      map.current = new Map({
+        container: mapContainer.current,
+        style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+        center: [16.5455, 59.6099], // Västerås
+        zoom: 11,
+      })
+    }
 
-    map.current.once('load', () => {
-      const points = properties.map((property, index) => ({
+    const points = properties
+      .filter((_, index) => coordinates[index])
+      .map((property, index) => ({
         position: coordinates[index],
         property: property,
       }))
 
-      const deckOverlay = new MapboxOverlay({
-        interleaved: true,
-        layers: [
-          new ScatterplotLayer({
-            id: 'properties',
-            data: points,
-            getPosition: (d) => d.position,
-            getFillColor: [65, 105, 225], // Royal blue
-            getRadius: 300,
-            pickable: true,
-            onClick: (info) => {
-              if (info.object && info.object.property) {
-                console.log(
-                  'Clicked property:',
-                  info.object.property.designation
-                )
-              }
-            },
-            updateTriggers: {
-              getFillColor: points,
-            },
-          }),
-        ],
-      })
-
-      map.current?.addControl(deckOverlay)
-
+    const deckOverlay = new MapboxOverlay({
+      interleaved: true,
+      layers: [
+        new ScatterplotLayer({
+          id: 'properties',
+          data: points,
+          getPosition: (d) => d.position,
+          getFillColor: [65, 105, 225], // Royal blue
+          getRadius: 300,
+          pickable: true,
+          onClick: (info) => {
+            if (info.object && info.object.property) {
+              console.log(
+                'Clicked property:',
+                info.object.property.designation
+              )
+            }
+          },
+        }),
+      ],
     })
 
-    return () => {
-      map.current?.remove()
+    // Remove existing overlay if any
+    const existingOverlay = map.current.getControl('deck-overlay')
+    if (existingOverlay) {
+      map.current.removeControl(existingOverlay)
     }
-  }, [properties])
+
+    map.current.addControl(deckOverlay, 'deck-overlay')
+
+    return () => {
+      if (map.current) {
+        const overlay = map.current.getControl('deck-overlay')
+        if (overlay) {
+          map.current.removeControl(overlay)
+        }
+      }
+    }
+  }, [properties, coordinates])
 
   return (
     <div className="relative">
