@@ -17,9 +17,9 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<Map | null>(null)
 
-  const [coordinates, setCoordinates] = React.useState<Array<[number, number]>>(
-    []
-  )
+  const [propertyCoordinates, setPropertyCoordinates] = React.useState<
+    Map<string, [number, number]>
+  >(new Map())
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
@@ -33,10 +33,10 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
       geocodingQueue.add(
         searchQuery,
         (coords) => {
-          setCoordinates(prev => {
-            const newCoords = [...prev, coords]
-            
-            return newCoords
+          setPropertyCoordinates(prev => {
+            const newMap = new Map(prev)
+            newMap.set(property.id, coords)
+            return newMap
           })
         },
         (error) => console.error(`Geocoding error for ${property.designation}:`, error)
@@ -47,7 +47,7 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
 
     // Cleanup function to reset coordinates when properties change
     return () => {
-      setCoordinates([])
+      setPropertyCoordinates(new Map())
     }
   }, [properties])
 
@@ -64,9 +64,9 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
     }
 
     const points = properties
-      .filter((_, index) => coordinates[index])
-      .map((property, index) => ({
-        position: coordinates[index],
+      .filter(property => propertyCoordinates.has(property.id))
+      .map(property => ({
+        position: propertyCoordinates.get(property.id)!,
         property: property,
       }))
 
