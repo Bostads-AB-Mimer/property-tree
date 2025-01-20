@@ -57,7 +57,7 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
     map.current = new Map({
       container: mapContainer.current,
       style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-      center: [18.0686, 59.3293], // Stockholm
+      center: [16.5455, 59.6099], // Västerås
       zoom: 11,
     })
 

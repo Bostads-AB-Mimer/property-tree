@@ -32,7 +32,7 @@ class GeocodingQueue {
 
       try {
         const result = await geocodingService.searchAddress(request.address)
-        request.resolve(result || [18.0686, 59.3293]) // Fallback to Stockholm
+        request.resolve(result || [16.5455, 59.6099]) // Fallback to Västerås
       } catch (error) {
         request.reject(error as Error)
       }
