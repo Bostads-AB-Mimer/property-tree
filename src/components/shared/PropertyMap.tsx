@@ -36,20 +36,19 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
 
       // Calculate bounds from real coordinates
       if (coords.length > 0) {
-        const newBounds = coords.reduce(
+        const initialBounds: [[number, number], [number, number]] = [
+          [coords[0][0], coords[0][1]],
+          [coords[0][0], coords[0][1]]
+        ]
+        
+        const newBounds = coords.reduce<[[number, number], [number, number]]>(
           (acc, [lng, lat]) => {
-            if (!acc) {
-              return [
-                [lng, lat],
-                [lng, lat],
-              ]
-            }
             return [
               [Math.min(acc[0][0], lng), Math.min(acc[0][1], lat)],
-              [Math.max(acc[1][0], lng), Math.max(acc[1][1], lat)],
+              [Math.max(acc[1][0], lng), Math.max(acc[1][1], lat)]
             ]
           },
-          null as [[number, number], [number, number]] | null
+          initialBounds
         )
 
         setBounds(newBounds)
