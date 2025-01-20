@@ -4,7 +4,7 @@ import { GET } from './baseApi'
 export const residenceService = {
   // Get all residences
   async getAll(): Promise<Residence[]> {
-    const { data, error } = await GET('/residences')
+    const { data, error } = await GET('/api/residences')
     if (error) throw error
     return data?.content || []
   },
@@ -34,7 +34,7 @@ export const residenceService = {
     return results
   },
   async getByBuildingCode(buildingCode: string) {
-    const { data, error } = await GET(`/residences`, {
+    const { data, error } = await GET(`/api/residences`, {
       params: { query: { buildingCode: buildingCode } },
     })
     if (error) throw error
@@ -42,7 +42,7 @@ export const residenceService = {
   },
 
   async getById(id: string) {
-    const { data, error } = await GET(`/residences/{id}`, {
+    const { data, error } = await GET(`/api/residences/{id}`, {
       params: { path: { id } },
     })
     if (error) throw error

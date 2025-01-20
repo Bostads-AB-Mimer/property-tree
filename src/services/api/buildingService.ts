@@ -6,7 +6,7 @@ type Building = components['schemas']['Building']
 export const buildingService = {
   // Get all buildings
   async getAll(): Promise<Building[]> {
-    const { data, error } = await GET('/buildings')
+    const { data, error } = await GET('/api/buildings')
     if (error) throw error
     return data?.content || []
   },
@@ -37,7 +37,7 @@ export const buildingService = {
   },
   // Get buildings by property code
   async getByPropertyCode(propertyCode: string) {
-    const { data, error } = await GET('/buildings', {
+    const { data, error } = await GET('/api/buildings', {
       params: { query: { propertyCode } },
     })
     if (error) throw error
@@ -46,7 +46,7 @@ export const buildingService = {
 
   // Get building by ID
   async getById(id: string) {
-    const { data, error } = await GET('/buildings/{id}', {
+    const { data, error } = await GET('/api/buildings/{id}', {
       params: { path: { id } },
     })
     if (error) throw error
