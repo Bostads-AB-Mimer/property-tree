@@ -20,9 +20,6 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
   const [coordinates, setCoordinates] = React.useState<Array<[number, number]>>(
     []
   )
-  const [bounds, setBounds] = React.useState<
-    [[number, number], [number, number]] | null
-  >(null)
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
@@ -39,25 +36,6 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
           setCoordinates(prev => {
             const newCoords = [...prev, coords]
             
-            // Update bounds with new coordinate
-            if (newCoords.length === 1) {
-              setBounds([[coords[0], coords[1]], [coords[0], coords[1]]])
-            } else {
-              setBounds(prevBounds => {
-                if (!prevBounds) return [[coords[0], coords[1]], [coords[0], coords[1]]]
-                return [
-                  [
-                    Math.min(prevBounds[0][0], coords[0]),
-                    Math.min(prevBounds[0][1], coords[1])
-                  ],
-                  [
-                    Math.max(prevBounds[1][0], coords[0]),
-                    Math.max(prevBounds[1][1], coords[1])
-                  ]
-                ]
-              })
-            }
-            
             return newCoords
           })
         },
@@ -70,7 +48,6 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
     // Cleanup function to reset coordinates when properties change
     return () => {
       setCoordinates([])
-      setBounds(null)
     }
   }, [properties])
 
@@ -117,13 +94,6 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
 
       map.current?.addControl(deckOverlay)
 
-      // Fit bounds if we have properties
-      if (bounds) {
-        map.current.fitBounds(bounds, {
-          padding: 50,
-          maxZoom: 15,
-        })
-      }
     })
 
     return () => {
