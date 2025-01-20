@@ -53,34 +53,29 @@ export function PropertyMap({ properties }: PropertyMapProps) {
   }, [properties])
 
   useEffect(() => {
-    // Wait for next tick to ensure container is mounted
-    const timer = setTimeout(() => {
-      if (!mapContainer.current || map.current) return
+    if (!mapContainer.current) return
+
+    const initMap = () => {
+      if (map.current) return
 
       try {
-        const mapInstance = new Map({
-          container: mapContainer.current,
-          style:
-            'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+        map.current = new Map({
+          container: mapContainer.current!,
+          style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
           center: [16.5455, 59.6099], // Västerås
           zoom: 11,
           antialias: true,
           preserveDrawingBuffer: true,
           maxZoom: 20,
+          renderWorldCopies: false
         })
-
-        map.current = mapInstance
-
-        return () => {
-          if (mapInstance) {
-            mapInstance.remove()
-            map.current = null
-          }
-        }
       } catch (error) {
         console.error('Failed to initialize map:', error)
       }
-    }, 0)
+    }
+
+    // Try to init map after a short delay to ensure DOM is ready
+    const timer = setTimeout(initMap, 100)
 
     return () => {
       clearTimeout(timer)
@@ -89,7 +84,7 @@ export function PropertyMap({ properties }: PropertyMapProps) {
         map.current = null
       }
     }
-  }, [])
+  }, [mapContainer.current])
 
   useEffect(() => {
     if (!map.current) return
