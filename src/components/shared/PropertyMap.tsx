@@ -17,8 +17,8 @@ export function PropertyMap({ properties }: PropertyMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<Map | null>(null)
 
-  const [propertyCoordinates, setPropertyCoordinates] = useState(
-    new Map<string, [number, number]>()
+  const [propertyCoordinates, setPropertyCoordinates] = useState<Map<string, [number, number]>>(
+    new Map()
   )
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -48,7 +48,7 @@ export function PropertyMap({ properties }: PropertyMapProps) {
 
     // Cleanup function to reset coordinates when properties change
     return () => {
-      setPropertyCoordinates({})
+      setPropertyCoordinates(new Map())
     }
   }, [properties])
 
@@ -64,6 +64,9 @@ export function PropertyMap({ properties }: PropertyMapProps) {
             'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
           center: [16.5455, 59.6099], // Västerås
           zoom: 11,
+          antialias: true,
+          preserveDrawingBuffer: true,
+          maxZoom: 20,
         })
 
         map.current = mapInstance
