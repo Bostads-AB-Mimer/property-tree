@@ -92,20 +92,12 @@ export function PropertyMap({ properties, companyName }: PropertyMapProps) {
       ],
     })
 
-    // Remove existing overlay if any
-    const existingOverlay = map.current.getControl('deck-overlay')
-    if (existingOverlay) {
-      map.current.removeControl(existingOverlay)
-    }
-
-    map.current.addControl(deckOverlay, 'deck-overlay')
+    // Add new overlay
+    map.current.addControl(deckOverlay)
 
     return () => {
       if (map.current) {
-        const overlay = map.current.getControl('deck-overlay')
-        if (overlay) {
-          map.current.removeControl(overlay)
-        }
+        map.current.removeControl(deckOverlay)
       }
     }
   }, [properties, coordinates])
