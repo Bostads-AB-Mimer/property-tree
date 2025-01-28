@@ -79,7 +79,7 @@ export function CompanyView() {
     <div className="p-8 animate-in">
       <ViewHeader
         title={company.name}
-        subtitle={`${company.properties?.length} fastigheter`}
+        subtitle={`${propertiesQuery.data?.length} fastigheter`}
         type="Företag"
         icon={Building2}
       />
@@ -87,7 +87,7 @@ export function CompanyView() {
       <Grid cols={4} className="mb-8">
         <StatCard
           title="Fastigheter"
-          value={company.properties?.length}
+          value={propertiesQuery.data?.length || '0'}
           icon={Building2}
         />
         <StatCard

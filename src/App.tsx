@@ -47,6 +47,7 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-900">
       <SidebarProvider>
+        <CommandPalette />
         <SidebarNavigation />
         <SidebarInset>
           <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">

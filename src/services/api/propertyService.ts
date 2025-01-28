@@ -9,7 +9,7 @@ export const propertyService = {
       params: { query: { companyCode: company.code } },
     })
     if (error) throw error
-    return data.content
+    return data?.content
   },
 
   async getPropertyById(propertyId: string) {
